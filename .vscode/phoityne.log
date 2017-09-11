@@ -1,0 +1,33 @@
+2017-03-08 17:06:12 [ThreadId 3] ERROR phoityne - ghci launch error. stack: runProcess: does not exist (No such file or directory)
+
+2017-03-08 17:06:12 [ThreadId 3] ERROR phoityne - [disconnectRequestHandler] ghci not started.
+2017-03-08 17:09:10 [ThreadId 3] ERROR phoityne - ghci launch error. stack: runProcess: does not exist (No such file or directory)
+
+2017-03-08 17:09:10 [ThreadId 3] ERROR phoityne - [disconnectRequestHandler] ghci not started.
+2017-03-08 17:10:05 [ThreadId 3] ERROR phoityne - ghci launch error. stack: runProcess: does not exist (No such file or directory)
+
+2017-03-08 17:10:05 [ThreadId 3] ERROR phoityne - [disconnectRequestHandler] ghci not started.
+2017-03-08 17:23:36 [ThreadId 3] ERROR phoityne - ghci launch error. <file descriptor: 5>: hPutChar: resource vanished (Broken pipe)
+
+2017-03-08 17:23:36 [ThreadId 3] ERROR phoityne - [disconnectRequestHandler] ghci not started.
+2017-03-08 17:35:00 [ThreadId 3] ERROR phoityne - ghci launch error. <file descriptor: 5>: hPutChar: resource vanished (Broken pipe)
+
+2017-03-08 17:35:00 [ThreadId 3] ERROR phoityne - [disconnectRequestHandler] ghci not started.
+2017-03-08 17:59:09 [ThreadId 3] ERROR phoityne - ghci launch error. <file descriptor: 5>: hPutChar: resource vanished (Broken pipe)
+
+2017-03-08 17:59:09 [ThreadId 3] ERROR phoityne - [disconnectRequestHandler] ghci not started.
+2017-03-08 17:59:27 [ThreadId 3] ERROR phoityne - ghci launch error. <file descriptor: 5>: hPutChar: resource vanished (Broken pipe)
+
+2017-03-08 17:59:27 [ThreadId 3] ERROR phoityne - [disconnectRequestHandler] ghci not started.
+2017-03-08 18:00:53 [ThreadId 3] ERROR phoityne - ghci launch error. <file descriptor: 5>: hPutChar: resource vanished (Broken pipe)
+
+2017-03-08 18:00:53 [ThreadId 3] ERROR phoityne - [disconnectRequestHandler] ghci not started.
+2017-03-08 18:11:09 [ThreadId 3] ERROR phoityne - ghci launch error. <file descriptor: 5>: hPutChar: resource vanished (Broken pipe)
+
+2017-03-08 18:11:09 [ThreadId 3] ERROR phoityne - [disconnectRequestHandler] ghci not started.
+2017-03-08 18:11:25 [ThreadId 3] ERROR phoityne - ghci launch error. <file descriptor: 5>: hPutChar: resource vanished (Broken pipe)
+
+2017-03-08 18:11:25 [ThreadId 3] ERROR phoityne - [disconnectRequestHandler] ghci not started.
+2017-03-08 18:11:55 [ThreadId 3] ERROR phoityne - ghci launch error. <file descriptor: 5>: hPutChar: resource vanished (Broken pipe)
+
+2017-03-08 18:11:55 [ThreadId 3] ERROR phoityne - [disconnectRequestHandler] ghci not started.

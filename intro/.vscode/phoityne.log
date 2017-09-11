@@ -1,0 +1,6 @@
+2017-03-08 18:12:43 [ThreadId 3] ERROR phoityne - load file fail.[c:\data\solutions\hsplay\intro/test/Spec.hs] file load error. 'c:\data\solutions\hsplay\intro/test/Spec.hs'
+2017-03-08 18:12:43 [ThreadId 3] ERROR phoityne - startup load error. c:\data\solutions\hsplay\intro/test/Spec.hs
+
+2017-03-09 08:55:34 [ThreadId 3] ERROR phoityne - load file fail.[c:\data\solutions\hsplay\intro/test/Spec.hs] file load error. 'c:\data\solutions\hsplay\intro/test/Spec.hs'
+2017-03-09 08:55:34 [ThreadId 3] ERROR phoityne - startup load error. c:\data\solutions\hsplay\intro/test/Spec.hs
+
