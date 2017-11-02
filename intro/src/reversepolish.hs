@@ -1,34 +1,18 @@
 module RPN where
 
 import Text.Parsec
-import Text.Parsec.Char
-import Text.ParserCombinators.Parsec.Combinator
 import Data.List.Split (splitOn)
 import Data.List
 
 type Parser = Parsec String ()
     
 calc :: String -> Double
-calc str = eval $ either (const (Lit 0)) id (parse (exps <|> lit) "" (rev str))
+calc str = either (const 0) id (parse (exps <|> double) "" (rev str))
 
 rev :: String -> String
 rev = (intercalate " ") . reverse . (splitOn " ")
 
-data Expr = 
-    Add Expr Expr
-    | Sub Expr Expr
-    | Mul Expr Expr
-    | Div Expr Expr
-    | Lit Double deriving (Show, Eq)
-
-eval :: Expr -> Double
-eval (Add a b) = eval a + eval b
-eval (Sub a b) = eval b - eval a
-eval (Mul a b) = eval a * eval b
-eval (Div a b) = eval b / eval a
-eval (Lit a) = a
-
-exps :: Parser Expr
+exps :: Parser Double
 exps = do
     spaces
     f <- op
@@ -39,20 +23,17 @@ exps = do
     spaces
     return (f a b)
 
-term :: Parser Expr
-term = lit <|> exps
+term :: Parser Double
+term = double <|> exps
 
-lit :: Parser Expr
-lit = Lit <$> double
+charOpMaps :: [(Char, (Double -> Double -> Double))]
+charOpMaps = [ ('+', (+)), ('-', flip (-)), ('*', (*)), ('/', flip (/))]
 
-op :: Parser (Expr -> Expr -> Expr)
-op = do { o <- oneOf opChars; return (getOp o) }
+op :: Parser (Double -> Double -> Double)
+op = do { o <- oneOf (fst <$> charOpMaps); return (getOp o) }
 
-opChars :: [Char]
-opChars = "+-*/"
-
-getOp :: Char -> (Expr -> Expr -> Expr)
-getOp c = snd $ head $ filter ((c ==).fst) (zip opChars [Add, Sub, Mul, Div])
+getOp :: Char -> (Double -> Double -> Double)
+getOp c = snd $ head $ filter ((c ==).fst) charOpMaps
 
 double :: Parser Double
 double = do
