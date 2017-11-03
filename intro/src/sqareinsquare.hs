@@ -4,25 +4,18 @@ import Data.List
 import Control.Applicative
     
 decompose :: Integer -> Maybe [Integer]
-decompose n = roots $ seek (n ^ 2) [] squares where
-    squares = reverse $ (^2) <$> [1..(n-1)]
-    roots :: Maybe [Integer] -> Maybe [Integer]
-    roots = (((root) <$>) <$>)
+decompose n = seek tot (n-1) tot [] where tot = n ^ 2
 
 root :: Integer -> Integer
-root = round . sqrt . fromInteger
+root = floor . sqrt . fromInteger
 
-seek :: Integer -> [Integer] -> [Integer] -> Maybe [Integer]
-seek tot taken rest = 
-    let sumTaken = sum taken
-        sumRest = sum rest
-        diff = tot - sumTaken
-        stillPossible = sumTaken < tot && sumRest >= diff
-        in case (sumTaken == tot, stillPossible, rest) of
-            (True, _, _) -> Just taken
-            (_, False, _) -> Nothing
-            (False, _, []) -> Nothing
-            (False, _, (x:xs)) -> 
-                let diff' = diff - x
-                    next = seek tot (x:taken) (dropWhile (\n -> n > diff') xs)
-                    in next <|> seek tot taken (dropWhile (\n -> n > diff) xs)
+seek :: Integer -> Integer -> Integer -> [Integer] -> Maybe [Integer]
+seek _ _ 0 result = if nub result == result then Just result else Nothing
+seek _ _ _ (1:_) = Nothing
+seek _ 0 _ _ = Nothing
+seek tot cur remainder result = 
+    if cur <= 0
+        then Nothing 
+        else continued <|> jumped where
+            continued = let nextRemainder = remainder - cur^2 in seek tot (root nextRemainder) nextRemainder (cur:result)
+            jumped = seek tot (cur - 1) remainder result
