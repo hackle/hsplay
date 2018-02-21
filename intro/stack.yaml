@@ -39,7 +39,7 @@ packages:
 - '.'
 # Dependency packages to be pulled from upstream that are not in the resolver
 # (e.g., acme-missiles-0.3)
-extra-deps: []
+extra-deps: [ th-desugar-1.8, th-expand-syns-0.4.2.0, th-lift-0.7.6, th-orphans-0.13.3, th-lift-instances-0.1.11, th-reify-many-0.1.6, safe-0.3.14 ]
 
 # Override default flag values for local packages and extra-deps
 flags: {}
