@@ -1,54 +1,51 @@
 {-# LANGUAGE PackageImports #-}
 import "matrix" Data.Matrix hiding ((<|>))
 import Data.List
+import Data.Ord
 import Data.List.Split
 import Control.Applicative
 
-paths :: Int -> Int -> Matrix Int -> Maybe [[Int]]
-paths x y mx = nexts (mx!(1,1)) where
+data Path = Path { getPos :: (Int, Int), getSum::Int } deriving Eq
+
+shortest1 :: Matrix Int -> Int
+shortest1 mx = go [ Path (1, 1) start ] start where
+    start = mx!(1,1)
     (lx, ly) = (nrows mx, ncols mx)
-    nexts cMin = do
-        v <- safeGet x y mx
-        if (lx, ly) == (x, y) 
-            then Just [[v]] 
-            else combine v (paths x (y+1) mx) (paths (x+1) y mx)
-    combine v (Just xs) (Just ys) = Just $ deepCons v xs ++ deepCons v ys
-    combine v xs ys = (deepCons v) <$> (xs <|> ys)
-    deepCons x xxs = (x :) <$> xxs
+    go :: [ Path ] -> Int -> Int
+    go paths minV =
+        let (minPath:xs) = paths in
+            if (lx, ly) == getPos minPath
+                then getSum minPath
+                else 
+                    let nexts = advance minPath
+                        minNew = foldl min minV (getSum <$> nexts) 
+                        paths' = foldl (\ps p -> insertBy comparePaths p ps) xs nexts in
+                        go paths' minNew
+    advance :: Path -> [Path]
+    advance (Path (y, x) val) = combine right1 down1 where
+        right1 = getPath (y, x+1) val
+        down1 = getPath (y+1, x) val
+    combine p1 p2 = let (Just xs) = sequence $ filter (\p -> p /= Nothing) [ p1, p2 ] in xs
+    getPath (y, x) val = do
+        v <- safeGet y x mx
+        return $ Path (y, x) (val + v)
+    comparePaths = comparing getSum
+
+-- paths :: Matrix Int -> Maybe [[Int]]
+-- paths x y mx = nexts (mx!(1,1)) where
+--     nexts cMin = do
+--         v <- safeGet x y mx
+--         if (lx, ly) == (x, y) 
+--             then Just [[v]] 
+--             else combine v (paths x (y+1) mx) (paths (x+1) y mx)
+--     combine v (Just xs) (Just ys) = Just $ deepCons v xs ++ deepCons v ys
+--     combine v xs ys = (deepCons v) <$> (xs <|> ys)
+--     deepCons x xxs = (x :) <$> xxs
 
 parse :: [String] -> Matrix Int
 parse strs = fromLists (((\a -> read [a]::Int) <$>) <$> strs)
 
--- shortest :: [String] -> Int
--- shortest strs = case head . (sortOn id) . (sum <$>) <$> (paths 1 1 $ parse strs) of
---     Nothing -> 0
---     Just n -> n
-
-shortest :: [String] -> Int
-shortest strs = case withMinSum <$> (paths 1 1 $ parse strs) of
-    Nothing -> 0
-    Just n -> n
-
-withMinSum :: [[Int]] -> Int
-withMinSum xss = goNext (cacheSum <$> heads) where
-    heads = (splitAt 1) <$> xss
-    cacheSum (hs, ts) = (False, sum hs, hs, ts)
-    goNext :: [(Bool, Int, [Int], [Int])] -> Int
-    goNext cur =
-        let curMin = minSum cur in
-            case find (\(succ, _, _, _) -> succ) cur of
-                Nothing -> goNext ((advance curMin) <$> cur)
-                Just (_, s, _, _) -> s
-
-minSum :: [(Bool, Int, [Int], [Int])] -> Int
-minSum xss  = foldl1 min sums where
-    sums = (\(_, n, _, _) -> n) <$> xss
-
-advance :: Int -> (Bool, Int, [Int], [Int]) -> (Bool, Int, [Int], [Int])
-advance minSum ori@(_, sum1, ts, (r:rs)) = 
-    if sum1 <= minSum 
-        then (null rs, r + minSum, r:ts, rs) 
-        else ori
+shortest = shortest1 . parse
 
 -- test
 test1 = shortest ["567", "133", "502"] == 11
