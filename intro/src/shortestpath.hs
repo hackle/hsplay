@@ -5,9 +5,9 @@ import Data.List.Split
 import Control.Applicative
 
 paths :: Int -> Int -> Matrix Int -> Maybe [[Int]]
-paths x y mx = nexts where
+paths x y mx = nexts (mx!(1,1)) where
     (lx, ly) = (nrows mx, ncols mx)
-    nexts = do
+    nexts cMin = do
         v <- safeGet x y mx
         if (lx, ly) == (x, y) 
             then Just [[v]] 
