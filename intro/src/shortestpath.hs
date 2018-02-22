@@ -19,10 +19,36 @@ paths x y mx = nexts where
 parse :: [String] -> Matrix Int
 parse strs = fromLists (((\a -> read [a]::Int) <$>) <$> strs)
 
+-- shortest :: [String] -> Int
+-- shortest strs = case head . (sortOn id) . (sum <$>) <$> (paths 1 1 $ parse strs) of
+--     Nothing -> 0
+--     Just n -> n
+
 shortest :: [String] -> Int
-shortest strs = case head . (sortOn id) . (sum <$>) <$> (paths 1 1 $ parse strs) of
+shortest strs = case withMinSum <$> (paths 1 1 $ parse strs) of
     Nothing -> 0
     Just n -> n
+
+withMinSum :: [[Int]] -> Int
+withMinSum xss = goNext (cacheSum <$> heads) where
+    heads = (splitAt 1) <$> xss
+    cacheSum (hs, ts) = (False, sum hs, hs, ts)
+    goNext :: [(Bool, Int, [Int], [Int])] -> Int
+    goNext cur =
+        let curMin = minSum cur in
+            case find (\(succ, _, _, _) -> succ) cur of
+                Nothing -> goNext ((advance curMin) <$> cur)
+                Just (_, s, _, _) -> s
+
+minSum :: [(Bool, Int, [Int], [Int])] -> Int
+minSum xss  = foldl1 min sums where
+    sums = (\(_, n, _, _) -> n) <$> xss
+
+advance :: Int -> (Bool, Int, [Int], [Int]) -> (Bool, Int, [Int], [Int])
+advance minSum ori@(_, sum1, ts, (r:rs)) = 
+    if sum1 <= minSum 
+        then (null rs, r + minSum, r:ts, rs) 
+        else ori
 
 -- test
 test1 = shortest ["567", "133", "502"] == 11
