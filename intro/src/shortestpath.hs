@@ -18,7 +18,7 @@ shortest1 mx = go [ Path (1, 1) start ] start where
                 then getSum minPath
                 else 
                     let nexts = advance minPath
-                        minNew = foldl min minV (getSum <$> nexts) 
+                        minNew = if null nexts then minV else foldl1 min (getSum <$> nexts) 
                         paths' = foldl (\ps p -> insertBy comparePaths p ps) xs nexts in
                         go paths' minNew
     advance :: Path -> [Path]
