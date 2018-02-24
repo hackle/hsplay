@@ -1,7 +1,5 @@
 {-# LANGUAGE PackageImports #-}
 import "matrix" Data.Matrix hiding ((<|>))
-import Data.Ord
-import Data.List.Split
 import Control.Applicative
 import qualified Data.Map.Strict as M
 
@@ -12,59 +10,22 @@ shortest :: Matrix Int -> Int
 shortest mx = go mx cell1 where cell1 = M.singleton (1,1) (mx!(1,1))
 
 go :: Matrix Int -> Map Pos Int -> Int
-go mx cs = 
-    let cs' = advance mx cs in
-        case M.lookup (nrows mx, ncols mx) cs' of
-            Nothing -> go mx cs'
-            Just c -> c
+go mx cs = maybe (go mx cs') id attempt where
+    cs' = advance mx cs
+    attempt = M.lookup (nrows mx, ncols mx) cs'
 
 advance :: Matrix Int -> Map Pos Int-> Map Pos Int
 advance mx ps = M.foldlWithKey (update1 mx) M.empty ps
 
 update1 :: Matrix Int -> Map Pos Int -> Pos -> Int -> Map Pos Int
-update1 mx mp (r, c) s = foldl set1 mp [(r+1, c), (r, c+1)] where
-    set1 m pos@(r, c) =
-        case (safeGet r c mx, M.lookup pos m) of
-            (Nothing, _) -> m
-            (Just incr, Nothing) -> M.insert pos (s+incr) m
-            (Just incr, Just s1) -> if (s+incr) < s1 then M.insert pos (s+incr) m else m
-
--- data Path = Path { getPos :: (Int, Int), getSum::Int } deriving Eq
-
--- shortest1 :: Matrix Int -> Int
--- shortest1 mx = go [ Path (1, 1) start ] start where
---     start = mx!(1,1)
---     (lx, ly) = (nrows mx, ncols mx)
---     go :: [ Path ] -> Int -> Int
---     go paths minV =
---         let (minPath:xs) = paths in
---             if (lx, ly) == getPos minPath
---                 then getSum minPath
---                 else 
---                     let nexts = advance minPath
---                         minNew = if null nexts then minV else foldl1 min (getSum <$> nexts) 
---                         paths' = foldl (\ps p -> insertBy comparePaths p ps) xs nexts in
---                         go paths' minNew
---     advance :: Path -> [Path]
---     advance (Path (y, x) val) = combine right1 down1 where
---         right1 = getPath (y, x+1) val
---         down1 = getPath (y+1, x) val
---     combine p1 p2 = let (Just xs) = sequence $ filter (\p -> p /= Nothing) [ p1, p2 ] in xs
---     getPath (y, x) val = do
---         v <- safeGet y x mx
---         return $ Path (y, x) (val + v)
---     comparePaths = comparing getSum
-
--- paths :: Matrix Int -> Maybe [[Int]]
--- paths x y mx = nexts (mx!(1,1)) where
---     nexts cMin = do
---         v <- safeGet x y mx
---         if (lx, ly) == (x, y) 
---             then Just [[v]] 
---             else combine v (paths x (y+1) mx) (paths (x+1) y mx)
---     combine v (Just xs) (Just ys) = Just $ deepCons v xs ++ deepCons v ys
---     combine v xs ys = (deepCons v) <$> (xs <|> ys)
---     deepCons x xxs = (x :) <$> xxs
+update1 mx mp (r, c) summ = foldl (set1 mx summ) mp [(r+1, c), (r, c+1)]
+    
+set1 :: Matrix Int -> Int -> Map Pos Int -> Pos -> Map Pos Int
+set1 mx summ m pos@(r, c) = maybe m upsert (safeGet r c mx) where
+    upsert incr = maybe (ins incr) (upd incr) (M.lookup pos m)
+    ins incr = M.insert pos (summ+incr) m
+    upd incr s1 = let proj = summ+incr in
+        if proj < s1 then M.insert pos proj m else m
 
 parse :: [String] -> Matrix Int
 parse strs = fromLists (((\a -> read [a]::Int) <$>) <$> strs)
