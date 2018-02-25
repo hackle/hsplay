@@ -1,6 +1,5 @@
 {-# LANGUAGE PackageImports #-}
 import "matrix" Data.Matrix hiding ((<|>))
-import Control.Applicative
 import qualified Data.Map.Strict as M
 
 type Map = M.Map
