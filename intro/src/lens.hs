@@ -27,7 +27,7 @@ myView :: ((a -> Const a a) -> s -> Const a s) -> s -> a
 myView l s = getConst $ l Const s
 
 mySet :: ((a -> Identity a) -> s -> Identity s) -> a -> s -> s
-mySet l a s = runIdentity $ l (Identity . const a) s
+mySet l a s = myOver l (const a) s
 
 myOver :: ((a -> Identity b) -> s -> Identity t) -> (a -> b) -> s -> t
 myOver l f s = runIdentity $ l (Identity . f) s
