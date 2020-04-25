@@ -3,60 +3,24 @@ import qualified Data.List as L
 import qualified System.Random as R
 import System.Timeout
 
-conwayM :: Int -> Int -> IO ()
-conwayM c r = do 
+play :: Integer -> Integer -> IO ()
+play c r = do 
     ns <- randoms
-    print1 $ (fromGame <$> (conway $ genGame c r ns))
+    print1 $ (toChars c <$> (games $ genGame c r ns))
     return ()
     where 
         print1 (x:xs) = do
             putStr "\ESC[2J"
             mapM putStrLn x
             c <- timeout 200000 getChar
-            maybe (print1 xs) (\c -> if 'q' == c then return () else print1 xs) c
-            
-
-seed :: [[Char]]
-seed = [
-    [ ' ', 'x', ' ' ],
-    [ 'x', 'x', 'x' ],
-    [ ' ', 'x', ' ' ]
-    ]
-
-randoms :: IO [Int]
-randoms = R.randoms <$> R.getStdGen 
-
-genGame :: Int -> Int -> [Int] -> Game
-genGame r c ns = 
-    let xs = take (r * c) $ even <$> ns
-        rows = L.unfoldr (\xs1 -> if L.null xs1 then Nothing else Just $ splitAt r xs1) xs
-    in toGame rows
-
-toGame :: [[Bool]] -> Game
-toGame xs = M.fromList $ L.concat $ byRow <$> zip [0..] ((zip [0..] <$> xs))
-    where 
-        byRow (y, xs) = cell y <$> xs
-        cell y (x, v) = ((x, y), v)
-
-fromGame :: Game -> [[Char]]
-fromGame g = L.unfoldr toRow $ toCell <$> rows
-    where
-        rows = M.toList g
-        toRow [] = Nothing
-        toRow xs = Just $ L.splitAt rowCnt xs
-        rowCnt = (+) 1 $ fromInteger $ L.maximum $ (fst . fst) <$> rows
-        toCell ((x, y), v) = if v then 'X' else ' '
+            case c of
+                Just 'q' -> return ()
+                _ -> print1 xs
 
 type Game = M.Map (Integer, Integer) Bool
 
-conway :: Game -> [Game]
-conway seed = seed : conway (next seed)
-
-coords = [ 
-    (-1, -1), (-1, 0), (-1, 1),
-    (0, -1),           (0, 1),
-    (1, -1),  (1, 0),  (1, 1)
-    ]
+games :: Game -> [Game]
+games seed = seed : games (next seed)
 
 next :: Game -> Game
 next g = M.fromList $ call <$> M.toList g
@@ -65,5 +29,25 @@ next g = M.fromList $ call <$> M.toList g
         let neighbors = cntNeighbors x y g;
                 live1 = (live && L.elem neighbors [2, 3]) || (not live && neighbors == 3)
         in ((x, y), live1)
-cntNeighbors x y g = L.length . L.filter id $ (getOne x y g) <$> coords
-getOne x y g (offX, offY) = maybe False id $ M.lookup (x + offX, y + offY) g
+
+coords = [ (x, y) | x <- [-1..1], y <- [-1..1], (x, y) /= (0, 0) ]
+cntNeighbors :: Integer -> Integer -> Game -> Int                
+cntNeighbors x y g = L.length . L.filter id $ (getOne x y) <$> coords
+    where 
+        getOne x y (offX, offY) = maybe False id $ M.lookup (x + offX, y + offY) g
+
+randoms :: IO [Bool]
+randoms = do 
+    ns <- R.randoms <$> R.getStdGen
+    return $ even <$> (ns :: [Int])
+
+genGame :: Integer -> Integer -> [Bool] -> Game
+genGame r c ns = M.fromList $ zip xys ns
+    where 
+        xys = [ (x, y) | x <- [ 0 .. r ], y <- [ 0 .. c ]]
+
+toChars :: Integer -> Game -> [[Char]]
+toChars r g = L.unfoldr toRow $ toCell <$> M.toList g
+    where
+        toRow xs = if L.null xs then Nothing else Just $ L.splitAt (fromInteger r) xs
+        toCell ((x, y), v) = if v then 'X' else ' '
