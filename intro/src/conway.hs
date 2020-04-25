@@ -10,7 +10,7 @@ play c r = do
     return ()
     where 
         print1 (x:xs) = do
-            putStr "\ESC[2J"
+            putStr "\ESC[2J" -- clears screen
             mapM putStrLn x
             c <- timeout 200000 getChar
             case c of
