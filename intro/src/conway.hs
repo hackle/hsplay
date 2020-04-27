@@ -11,8 +11,9 @@ type Cell = ((Int, Int), Bool)
 play :: Int -> Int -> IO ()
 play cols rows = do 
     vals <- randoms
-    printGame $ (games $ genGame cols rows vals)
-    return ()
+    genGame cols rows vals & 
+        games & 
+        printGame
     where 
         printGame (g:gs) = do
             putStr "\ESC[2J" -- clears screen
